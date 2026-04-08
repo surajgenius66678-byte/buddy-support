@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/router";
 
 const stories = [
   {
@@ -49,6 +50,9 @@ export default function GetStarted() {
   const scrollRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
   const [selectedRole, setSelectedRole] = useState("");
+  const [loginName, setLoginName] = useState("");
+  const [loginPhone, setLoginPhone] = useState("");
+  const router = useRouter();
 
   // Auto scroll effect
   useEffect(() => {
@@ -69,6 +73,29 @@ export default function GetStarted() {
 
     return () => clearInterval(interval);
   }, [isHovered]);
+      const handleLogin = () => {
+  const savedUser = JSON.parse(localStorage.getItem("buddySupportUser"));
+
+  if (!savedUser) {
+    alert("No signup data found");
+    return;
+  }
+
+  if (savedUser.username === loginName && savedUser.password === loginPhone) {
+    alert("Login successful!");
+
+    // Redirect based on role
+    if (savedUser.role === "student") {
+      router.push("/student/dashboard");
+    } else if (savedUser.role === "admin") {
+      router.push("/admin/dashboard");
+    }
+
+  } else {
+    alert("Invalid details");
+  }
+};
+
 
   return (
     <main className="min-h-screen flex bg-gradient-to-r from-purple-200 via-pink-100 to-blue-100">
@@ -129,32 +156,43 @@ export default function GetStarted() {
         </div>
 
         {/* Input fields */}
-        <input
-          type="text"
-          placeholder="Name"
-          className="border p-4 rounded-lg mb-5 text-xl focus:ring-2 focus:ring-purple-400 outline-none"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          className="border p-4 rounded-lg mb-5 text-xl focus:ring-2 focus:ring-purple-400 outline-none"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="border p-4 rounded-lg mb-8 text-xl focus:ring-2 focus:ring-purple-400 outline-none"
-        />
+            <input
+      type="text"
+      placeholder="Username"
+      value={loginName}
+      onChange={(e) => setLoginName(e.target.value)}
+      className="border p-4 rounded-lg mb-5 text-xl focus:ring-2 focus:ring-purple-400 outline-none"
+    />
 
-        <button className="bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition text-2xl mb-4 shadow-md hover:shadow-xl">
-          Login
-        </button>
+    <input
+      type="password"
+      placeholder="Password"
+      value={loginPhone}
+      onChange={(e) => setLoginPhone(e.target.value)}
+      className="border p-4 rounded-lg mb-8 text-xl focus:ring-2 focus:ring-purple-400 outline-none"
+    />  
+
+        <button
+  onClick={handleLogin}
+  className="bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition text-2xl mb-4 shadow-md hover:shadow-xl"
+>
+  Login
+</button>
 
         {/* Informational line */}
         <p className="text-center text-white text-lg">
           If you have not signed in yet, {" "}
-          <a href="/signup-details" className="font-bold underline hover:text-yellow-200">
-            Signup
-          </a>
+         <button
+  onClick={() => {
+    if (!selectedRole) {
+      alert("Please select Student or Admin first");
+      return;
+    }
+    window.location.href = `/signup-details/${selectedRole.toLowerCase()}`;
+  }}
+>
+  Signup
+</button>
         </p>
       </div>
     </main>

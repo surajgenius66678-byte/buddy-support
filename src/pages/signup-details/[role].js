@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 export default function SignupDetails() {
-  const [role, setRole] = useState(null); // store role
+  const [role, setRole] = useState(null);
   const [formData, setFormData] = useState({});
   const router = useRouter();
 
-  // Only set role on client
+  // Get role from URL query
   useEffect(() => {
     if (router.isReady) {
       setRole(router.query.role || null);
@@ -19,11 +19,26 @@ export default function SignupDetails() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Data Submitted:", formData);
-    alert("Form submitted successfully!");
+
+    if (!role) {
+      alert("Role not found");
+      return;
+    }
+
+    // Save data with role, username, password
+    const saveData = {
+      ...formData,
+      role, // "student" or "admin"
+      username: formData.username || formData.name,
+      password: formData.password || formData.phoneNo || formData.parentPhone,
+    };
+
+    localStorage.setItem("buddySupportUser", JSON.stringify(saveData));
+
+    alert("Signup successful!");
+    router.push("/get-started"); // redirect to login page
   };
 
-  // If role is not ready yet (during SSR), show loading
   if (!role) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -32,29 +47,45 @@ export default function SignupDetails() {
     );
   }
 
+  const isStudent = role.toLowerCase() === "student";
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 p-10">
       <h1 className="text-4xl font-bold mb-6 text-white">
-        {role === "Student" ? "Student Registration" : "Admin Registration"}
+        {isStudent ? "Student Registration" : "Admin Registration"}
       </h1>
 
       <form
         className="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl flex flex-col gap-4"
         onSubmit={handleSubmit}
       >
-        {role === "Student" ? (
+        {isStudent ? (
           <>
             <input
               type="text"
-              name="studentName"
-              placeholder="Your Name"
+              name="name"
+              placeholder="Student Name"
               className="border p-3 rounded-lg"
               onChange={handleChange}
             />
             <input
               type="text"
-              name="familyDetails"
-              placeholder="Family Details"
+              name="class"
+              placeholder="Class"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="rollNo"
+              placeholder="Roll No"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="parentPhone"
+              placeholder="Mother/Father Phone No"
               className="border p-3 rounded-lg"
               onChange={handleChange}
             />
@@ -66,9 +97,30 @@ export default function SignupDetails() {
               onChange={handleChange}
             />
             <input
+              type="number"
+              name="age"
+              placeholder="Age"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
               type="text"
-              name="grade"
-              placeholder="Grade/Class"
+              name="adminCode"
+              placeholder="Admin Code"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="username"
+              placeholder="Create Username"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Create Password"
               className="border p-3 rounded-lg"
               onChange={handleChange}
             />
@@ -77,7 +129,7 @@ export default function SignupDetails() {
           <>
             <input
               type="text"
-              name="adminName"
+              name="name"
               placeholder="Admin Name"
               className="border p-3 rounded-lg"
               onChange={handleChange}
@@ -91,15 +143,29 @@ export default function SignupDetails() {
             />
             <input
               type="text"
-              name="teacherId"
-              placeholder="Teacher ID"
+              name="phoneNo"
+              placeholder="Phone No"
               className="border p-3 rounded-lg"
               onChange={handleChange}
             />
             <input
-              type="email"
-              name="email"
-              placeholder="Email"
+              type="text"
+              name="schoolId"
+              placeholder="School ID"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="username"
+              placeholder="Create Username"
+              className="border p-3 rounded-lg"
+              onChange={handleChange}
+            />
+            <input
+              type="password"
+              name="password"
+              placeholder="Create Password"
               className="border p-3 rounded-lg"
               onChange={handleChange}
             />
